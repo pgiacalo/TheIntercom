@@ -1,0 +1,13 @@
+menu "My Bluetooth Audio Gateway Configuration"
+    choice DEVICE_ROLE
+        prompt "Select device role"
+        default DEVICE_ROLE_MASTER
+    config DEVICE_ROLE_MASTER
+        bool "Set device as Master"
+        default 0
+    config DEVICE_ROLE_SLAVE
+        bool "Set device as Slave"
+        default 1
+    help
+        Choose whether this device acts as a MASTER or a SLAVE for my version of the hfp_ag bluetooth earbuds audio gateway project.
+endmenu
