@@ -72,22 +72,6 @@ static void bt_hf_hdl_stack_evt(uint16_t event, void *p_param)
     }
 }
 
-// //PHIL added function do_startup_tasks_automatically() -- to connect, connect audio, and set volume levels automatically at startup
-// void do_startup_tasks_automatically(){
-
-//     hf_conn_handler(0, NULL);           // Automatically call the connect function
-
-//     vTaskDelay(pdMS_TO_TICKS(5000));    // Wait a few seconds to connect
-
-//     hf_conn_audio_handler(0, NULL);     // call the connect audio function
-
-//     char *argsSpeaker[] = {"vu", "0", "10"};   // Example: set speaker volume to 10
-//     hf_volume_control_handler(3, argsSpeaker); //3 arguments, provided in args
-
-//     char *argsMicrophone[] = {"vu", "1", "10"};   // Example: set microphone volume to 10
-//     hf_volume_control_handler(3, argsMicrophone); //3 arguments, provided in args
-// }
-
 void app_main(void)
 {
     /* Initialize NVS — it is used to store PHY calibration data */

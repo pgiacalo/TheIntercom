@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  */
 
-#include "phil_config.h"
+#include "bluetooth_config.h"
 #include "driver/gpio.h"
 #include "soc/gpio_reg.h"
 #include "soc/gpio_sig_map.h"
@@ -14,15 +14,22 @@
 
 #define TAG     "DEBUG: "
 
-// #define GPIO_LRC      (25)  //PHIL commented out these original pin assignments 
+// #define GPIO_LRC     (25)  //PHIL commented out these original pin assignments 
 // #define GPIO_DOUT    (5)
-// #define GPIO_BCLK       (26)
-// #define GPIO_DIN         (35)
+// #define GPIO_BCLK    (26)
+// #define GPIO_DIN     (35)
 
-#define GPIO_DIN         (14)    //PHIL changed to these pin assignments (see my note below)
-#define GPIO_DOUT        (25)    
-#define GPIO_BCLK        (26)    //PHIL Bit Clock (1.4 MHz pulses)
-#define GPIO_LRC         (27)    //PHIL LRC - Left/Right Channel Select or Word Select (was called FRAME SYNC)
+#if DEVICE_ROLE == ROLE_MASTER
+    #define GPIO_DIN         (14)    //PHIL changed to these pin assignments (see my note below)
+    #define GPIO_DOUT        (25)    
+    #define GPIO_BCLK        (26)    //PHIL Bit Clock (1.4 MHz pulses)
+    #define GPIO_LRC         (27)    //PHIL LRC - Left/Right Channel Select or Word Select (was called FRAME SYNC)
+#elif DEVICE_ROLE == ROLE_SLAVE
+    #define GPIO_DIN         (14)    //PHIL changed to these pin assignments (see my note below)
+    #define GPIO_DOUT        (25)    
+    #define GPIO_BCLK        (27)    //PHIL Bit Clock (1.4 MHz pulses)
+    #define GPIO_LRC         (26)    //PHIL LRC - Left/Right Channel Select or Word Select (was called FRAME SYNC)
+#endif
 
 /**************************************
 //PHIL added this note about the I2S and I2S pin numbers

@@ -13,11 +13,11 @@
 #include "argtable3/argtable3.h"
 #include "esp_log.h"
 
-#include "phil_config.h"
+#include "bluetooth_config.h"
 #include "gpio_pcm_config.h"
 
 
-esp_bd_addr_t hf_peer_addr = HF_PEER_ADDR;  //HF_PEER_ADDR is defined in phil_config.h
+esp_bd_addr_t hf_peer_addr = HF_PEER_ADDR;  //HF_PEER_ADDR is defined in "bluetooth_config.h"
 
 // #define ROLE_MASTER     0                       //PHIL added
 // #define ROLE_SLAVE      1                       //PHIL added
@@ -97,6 +97,8 @@ HF_CMD_HANDLER(conn)
     printf("Connect.\n");
     print_mac_address_and_role(hf_peer_addr);
     esp_hf_ag_slc_connect(hf_peer_addr);
+
+    esp_hf_ag_audio_connect(hf_peer_addr);  //PHIL added so that audio connect happens automatically after a connect    
     return 0;
 }
 
