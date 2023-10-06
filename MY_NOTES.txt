@@ -1,0 +1,15 @@
+
+Modified the following esp-idf library components in order to change some behaviors of the ESP32 API for bluetooth. 
+	
+	btc_hf_client.c
+		- added function calls so that a sequence of calls happens immediately after btc_hf_client_init() is called.
+			- this causes the bluetooth SLC to initialize, followed by connecting and connecting audio to the earbuds
+			 (this doesn't work. i still need to type 'con' to connect at startup)
+				btc_hf_client_init();
+        		btc_hf_client_connect(&arg->connect);
+        		btc_hf_client_connect_audio(&arg->connect_audio); 
+        - added a function call so that connect_audio() is called immediately after btc_hf_client_connect() is called.
+        	- this causes connect_audio() to always happen after a connect()
+        	  (this works)
+                btc_hf_client_connect(&arg->connect);
+        		btc_hf_client_connect_audio(&arg->connect_audio); 

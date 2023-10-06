@@ -98,6 +98,7 @@ HF_CMD_HANDLER(conn)
     print_mac_address_and_role(hf_peer_addr);
     esp_hf_ag_slc_connect(hf_peer_addr);
 
+    printf("Connect Audio\n");
     esp_hf_ag_audio_connect(hf_peer_addr);  //PHIL added so that audio connect happens automatically after a connect    
     return 0;
 }
@@ -165,8 +166,13 @@ HF_CMD_HANDLER(volume_control)
         print_mac_address_and_role(hf_peer_addr);
         return 1;
     }
-    printf("Volume Update\n");
+    if(ESP_HF_VOLUME_CONTROL_TARGET_SPK == target) {
+        printf("Speaker Volume Update\n");
+    } else if (ESP_HF_VOLUME_CONTROL_TARGET_MIC == target){
+        printf("Microphone Volume Update\n");        
+    } 
     print_mac_address_and_role(hf_peer_addr);
+
     esp_hf_ag_volume_control(hf_peer_addr, target, volume);
     return 0;
 }

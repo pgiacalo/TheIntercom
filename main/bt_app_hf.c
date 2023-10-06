@@ -27,6 +27,8 @@
 #include "bt_app_hf.h"
 #include "osi/allocator.h"
 
+// #include "btc_hf_client.h"  //PHIL added so we can call: bt_status_t btc_hf_client_connect_audio( bt_bdaddr_t *bd_addr )
+
 const char *c_hf_evt_str[] = {
     "CONNECTION_STATE_EVT",              /*!< SERVICE LEVEL CONNECTION STATE CONTROL */
     "AUDIO_STATE_EVT",                   /*!< AUDIO CONNECTION STATE CONTROL */
@@ -47,6 +49,11 @@ const char *c_hf_evt_str[] = {
     "BCS_EVT",                           /*!< CODEC NEGO EVT */
     "PKT_STAT_EVT",                      /*!< REQUEST PACKET STATUS EVT */
 };
+
+//----------
+//PHIL function declarations
+ void bt_app_send_data(void);
+//----------
 
 //esp_hf_connection_state_t
 const char *c_connection_state_str[] = {

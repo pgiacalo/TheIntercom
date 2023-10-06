@@ -12,43 +12,21 @@
 #include "esp_rom_gpio.h"
 #include "esp_log.h"
 
-#define TAG     "DEBUG: "
+#define TAG     "gpio_pcm_config"
 
-// #define GPIO_LRC     (25)  //PHIL commented out these original pin assignments 
-// #define GPIO_DOUT    (5)
-// #define GPIO_BCLK    (26)
-// #define GPIO_DIN     (35)
-
+// see bluetooth_config.h for the actual pin number settings
 #if DEVICE_ROLE == ROLE_MASTER
-    #define GPIO_DIN         (14)    //PHIL changed to these pin assignments (see my note below)
-    #define GPIO_DOUT        (25)    
-    #define GPIO_BCLK        (26)    //PHIL Bit Clock (1.4 MHz pulses)
-    #define GPIO_LRC         (27)    //PHIL LRC - Left/Right Channel Select or Word Select (was called FRAME SYNC)
+    #define GPIO_DIN         MASTER_GPIO_DIN
+    #define GPIO_DOUT        MASTER_GPIO_DOUT    
+    #define GPIO_BCLK        MASTER_GPIO_BCLK
+    #define GPIO_LRC         MASTER_GPIO_LRC
 #elif DEVICE_ROLE == ROLE_SLAVE
-    #define GPIO_DIN         (14)    //PHIL changed to these pin assignments (see my note below)
-    #define GPIO_DOUT        (25)    
-    #define GPIO_BCLK        (27)    //PHIL Bit Clock (1.4 MHz pulses)
-    #define GPIO_LRC         (26)    //PHIL LRC - Left/Right Channel Select or Word Select (was called FRAME SYNC)
+    #define GPIO_DIN         SLAVE_GPIO_DIN
+    #define GPIO_DOUT        SLAVE_GPIO_DOUT    
+    #define GPIO_BCLK        SLAVE_GPIO_BCLK
+    #define GPIO_LRC         SLAVE_GPIO_LRC
 #endif
 
-/**************************************
-//PHIL added this note about the I2S and I2S pin numbers
-
-I2S (Inter-IC Sound) uses PCM (Pulse-Code Modulation) to encode the audio data being transmitted.
-
-Here are the standard I2S pin numbers for the ESP32-WROOM-32D module.
-The ESP32 has two I2S peripherals, so there are 2 sets of I2S pins.
-
-    I2S0:
-        I2S Data: GPIO25
-        I2S Clock: GPIO26
-        I2S WS (Word Select): GPIO27
-
-    I2S1:
-        I2S Data: GPIO32
-        I2S Clock: GPIO33
-        I2S WS: GPIO34
-*************************************/
 
 #define GPIO_OUTPUT_PCM_PIN_SEL  ((1ULL<<GPIO_LRC) | (1ULL<<GPIO_BCLK) | (1ULL<<GPIO_DOUT))
 
@@ -84,24 +62,22 @@ void app_gpio_pcm_io_cfg(void)
     //configure GPIO with the given settings
     gpio_config(&io_conf);
 
-
-#if DEVICE_ROLE == ROLE_MASTER
+#if DEVICE_ROLE == ROLE_MASTER      //PHIL - see the esp-idf API's gpio_sig_map.h defines the PCM and I2S pin indexes (different versions for the ESP32-S3)
     // Master device sends data to the Slave
-    ESP_LOGI(TAG, "USING MASTER INPUT AND OUTPUT PINS");
-
-    esp_rom_gpio_connect_out_signal(GPIO_DOUT, PCMDOUT_IDX, false, false);           //output DOUT pin 25
-    esp_rom_gpio_connect_out_signal(GPIO_BCLK, PCMCLK_OUT_IDX, false, false);        //output BCLK pin 26
-    esp_rom_gpio_connect_out_signal(GPIO_LRC, PCMFSYNC_OUT_IDX, false, false);       //output LRC  pin 27
+    ESP_LOGI(TAG, "USING MASTER INPUT AND OUTPUT PINS | SD_IN: %d, SD_OUT: %d, BCLK_OUT: %d, LRC_OUT: %d", GPIO_DIN, GPIO_DOUT, GPIO_BCLK, GPIO_LRC);
+    esp_rom_gpio_connect_out_signal(GPIO_DOUT, PCMDOUT_IDX, false, false);   
+    esp_rom_gpio_connect_out_signal(GPIO_BCLK, PCMCLK_OUT_IDX, false, false); 
+    esp_rom_gpio_connect_out_signal(GPIO_LRC, PCMFSYNC_OUT_IDX, false, false);
     // Master device listens to the input from the Slave
-    esp_rom_gpio_connect_in_signal(GPIO_DIN, PCMDIN_IDX, false);                     //input DIN   pin 14
+    esp_rom_gpio_connect_in_signal(GPIO_DIN, PCMDIN_IDX, false); 
 #elif DEVICE_ROLE == ROLE_SLAVE
-    ESP_LOGI(TAG, "USING SLAVE INPUT AND OUTPUT PINS");
+    ESP_LOGI(TAG, "USING SLAVE INPUT AND OUTPUT PINS | SD_IN: %d, SD_OUT: %d, BCLK_IN: %d, LRC_IN: %d", GPIO_DIN, GPIO_DOUT, GPIO_BCLK, GPIO_LRC);
     // Slave device sends data to the Master
-    esp_rom_gpio_connect_out_signal(GPIO_DOUT, PCMDOUT_IDX, false, false);           //output DOUT pin 25
+    esp_rom_gpio_connect_out_signal(GPIO_DOUT, PCMDOUT_IDX, false, false); 
     // The slave listens to the Master's clock, LRC select, and data
-    esp_rom_gpio_connect_in_signal(GPIO_BCLK, PCMCLK_IN_IDX, false);                 //input BCLK pin 26 
-    esp_rom_gpio_connect_in_signal(GPIO_LRC, PCMFSYNC_IN_IDX, false);                //input LRC  pin 27
-    esp_rom_gpio_connect_in_signal(GPIO_DIN, PCMDIN_IDX, false);                     //input DIN  pin 14
+    esp_rom_gpio_connect_in_signal(GPIO_BCLK, PCMCLK_IN_IDX, false);    
+    esp_rom_gpio_connect_in_signal(GPIO_LRC, PCMFSYNC_IN_IDX, false);  
+    esp_rom_gpio_connect_in_signal(GPIO_DIN, PCMDIN_IDX, false);
 #endif
 
 }
