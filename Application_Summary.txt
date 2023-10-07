@@ -1,4 +1,12 @@
 Application_Summary.txt
+
+Source code referencing PCM
+  main.c
+  bt_app_hf.c
+  gpio_pcm_config.c
+  gpio_pcm_config.h
+
+
 /*
 Here's a high-level summary of the flow of execution of this application, starting from `app_main()`:
 
