@@ -4,6 +4,50 @@
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  */
 
+/*
+This file `gpio_pcm_config.c` relates to the configuration of the GPIO pins for Pulse Code Modulation (PCM) 
+audio data transfer and optionally, for Acoustic Echo Cancellation (AEC) if enabled. 
+PCM is commonly used to digitally represent analog signals, and AEC is useful to eliminate undesired echoing 
+during voice calls.
+
+Here's a breakdown of the file:
+
+1. Inclusion of Headers:
+    - The file includes relevant headers for GPIO and Bluetooth configuration and signal mapping, 
+    as well as logging utilities (`esp_log.h`).
+
+2. Role-Based GPIO Definitions:
+    - the code sets GPIO pins, depending on whether the device is acting as a master or a slave, 
+    per the `DEVICE_ROLE` macro defined in `bluetooth_config.h`.
+
+3. PCM GPIO Configuration Function `app_gpio_pcm_io_cfg`:
+    - This function configures GPIO pins for sending and receiving PCM audio data. Depending on 
+    the role (master or slave), 
+    - It also maps specific pins for PCM signals.
+    - The function uses the `gpio_config_t` structure and the `gpio_config()` function from the 
+    ESP-IDF framework to set up GPIO pins.
+
+4. AEC GPIO Configuration (Optional):
+    - If the `ACOUSTIC_ECHO_CANCELLATION_ENABLE` macro is defined (indicating that AEC is enabled), 
+    the file contains the function `app_gpio_aec_io_cfg` to set up GPIO pins for AEC.
+    - Acoustic Echo Cancellation (AEC) is a process to eliminate unwanted echoes that might be 
+    heard during a phone call due to the speaker's audio output being captured by the microphone.
+    - The function uses the same `gpio_config_t` structure and `gpio_config()` function to set up the GPIO pins.
+
+5. Logging: 
+    - Throughout the code, there are log statements (like `ESP_LOGI()`) that would output relevant information 
+    and status messages to a console or terminal. This aids in debugging and understanding the flow of the program.
+
+6. Comments: 
+    - The code contains explanatory comments that describe the purpose and functionality of various code segments, 
+    which is a good practice for understanding and maintaining the code.
+
+To integrate this code into a project, ensure that the relevant pin numbers and roles (master/slave) 
+are set in the `bluetooth_config.h` file. Also, if you need Acoustic Echo Cancellation, 
+the relevant macro should be defined. As with all hardware-related configurations, ensure you understand 
+the hardware design and connections before modifying or using this code.
+*/
+
 #include "bluetooth_config.h"
 #include "driver/gpio.h"
 #include "soc/gpio_reg.h"
@@ -32,6 +76,11 @@
 
 #define GPIO_INPUT_PCM_PIN_SEL (1ULL<<GPIO_DIN)
 
+/*
+ * Sets up GPIO pins for Pulse Code Modulation (PCM) audio data. 
+ * PCM is a method used to digitally represent analog signals. 
+ * In the Bluetooth context, PCM is a standard interface for transporting audio data between chips.
+ */
 void app_gpio_pcm_io_cfg(void)
 {
     gpio_config_t io_conf;
@@ -41,7 +90,7 @@ void app_gpio_pcm_io_cfg(void)
     //set as output mode
     io_conf.mode = GPIO_MODE_OUTPUT;
     //bit mask of the pins that you want to set,e.g.GPIO18/19
-    io_conf.pin_bit_mask = GPIO_OUTPUT_PCM_PIN_SEL;
+    io_conf.pin_bit_mask = GPIO_OUTPUT_PCM_PIN_SEL;             //the output pin
     //disable pull-down mode
     io_conf.pull_down_en = 0;
     //disable pull-up mode
@@ -89,6 +138,10 @@ void app_gpio_pcm_io_cfg(void)
 #define GPIO_OUTPUT_AEC_3      (22)
 #define GPIO_OUTPUT_AEC_PIN_SEL  ((1ULL<<GPIO_OUTPUT_AEC_1) | (1ULL<<GPIO_OUTPUT_AEC_2) | (1ULL<<GPIO_OUTPUT_AEC_3))
 
+/* 
+ * If AEC is enabled (with macro ACOUSTIC_ECHO_CANCELLATION_ENABLE), this function sets up the required GPIO pins for the AEC process. 
+ * AEC is crucial for voice call quality, as it helps remove the echo from the speaker that can be captured by the microphone.
+ */
 void app_gpio_aec_io_cfg(void)
 {
     gpio_config_t io_conf;

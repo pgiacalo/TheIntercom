@@ -3,6 +3,48 @@
  *
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  */
+/*
+app_hf_msg_set.c (Summary)
+
+This module, `app_hf_msg_set.c`, is a part of a Bluetooth Hands-Free Profile (HFP) application 
+and handles messages and commands related to the Audio Gateway (AG) aspect of HFP. 
+Specifically, it appears to be working with the ESP32 platform, considering the use 
+of APIs such as `esp_hf_ag_api.h`.
+
+Key Features:
+
+1. Global Definitions:
+   - The peer Bluetooth address is defined as `hf_peer_addr` and appears to be initialized using a constant `HF_PEER_ADDR` from the `bluetooth_config.h` file.
+
+2. Utility Functions:
+   - `print_mac_address_and_role()`: This function prints the MAC address and the role of the device. The role can be "Master", "Slave", or "Unknown".
+   
+3. Message and Command Handlers:
+   - The module contains handlers for various HFP AG commands. Handlers are functions that execute specific tasks when a corresponding command is received. These include tasks like connecting and disconnecting, audio management, voice recognition control, volume adjustments, and more.
+   
+4. Command Usage Manual:
+   - `hf_msg_show_usage()`: This function prints a list of supported commands with their respective explanations, providing a manual for users on how to use these commands.
+   
+5. Custom Modifications:
+   - Comments indicate that modifications have been made by a user named "PHIL". For instance, after establishing a connection, the audio connection is automatically set up.
+
+6. Console Command Registrations:
+   - The module uses the ESP32's `esp_console` to register HFP AG commands. Each command has associated explanations and arguments (if any). Examples of commands are "connect", "disconnect", "volume update", "start voice recognition", etc.
+   
+7. Command Tables:
+   - `hf_cmd_tbl`: It's a table mapping command strings to their respective handlers. This table is used to quickly lookup and execute the appropriate action when a command is received.
+   
+8. Command Explanation:
+   - `hf_cmd_explain`: An array providing explanations for various HFP AG commands, making it easier to understand each command's purpose.
+
+9. Argument Parsing:
+   - Several structs (e.g., `vu_args_t`, `ind_args_t`, `ate_args_t`) are defined to help parse command arguments using the `argtable3` library. This makes it simpler to retrieve and validate arguments from user input.
+
+10. Console Command Registration:
+   - The `register_hfp_ag()` function is used to register the available HFP AG commands with the ESP32's console. This function is pivotal in enabling user interactions with the system via a console interface.
+
+In essence, this module provides the command interface and handlers for the HFP AG functionalities on an ESP32 platform, allowing users to control and manage Bluetooth Hands-Free operations through textual commands.
+*/
 
 #include <stdio.h>
 #include <string.h>
@@ -12,24 +54,12 @@
 #include "esp_console.h"
 #include "argtable3/argtable3.h"
 #include "esp_log.h"
+#include "freertos/FreeRTOS.h"
 
 #include "bluetooth_config.h"
 #include "gpio_pcm_config.h"
 
-
 esp_bd_addr_t hf_peer_addr = HF_PEER_ADDR;  //HF_PEER_ADDR is defined in "bluetooth_config.h"
-
-// #define ROLE_MASTER     0                       //PHIL added
-// #define ROLE_SLAVE      1                       //PHIL added
-// /*****************************************/
-// #define DEVICE_ROLE            ROLE_MASTER      //PHIL please change this as needed
-// /*****************************************/
-
-// #if DEVICE_ROLE == ROLE_MASTER
-// esp_bd_addr_t hf_peer_addr = {0x58, 0xFC, 0xC6, 0x6C, 0x0A,0x03};   //PHIL MAC Address of Master - TOZO Home earbuds
-// #elif DEVICE_ROLE == ROLE_SLAVE
-// esp_bd_addr_t hf_peer_addr = {0x54, 0xB7, 0xE5, 0x8C, 0x07,0x71};   //PHIL MAC Address of Slave - TOZO Mazda earbuds
-// #endif
 
 //PHIL added this print function to provide a helpful context message when any command is called
 void print_mac_address_and_role(esp_bd_addr_t addr) {
@@ -94,12 +124,15 @@ HF_CMD_HANDLER(help)
 
 HF_CMD_HANDLER(conn)
 {
-    printf("Connect.\n");
+    printf("Connecting...\n");
     print_mac_address_and_role(hf_peer_addr);
     esp_hf_ag_slc_connect(hf_peer_addr);
+    printf("Connected\n");
 
-    printf("Connect Audio\n");
-    esp_hf_ag_audio_connect(hf_peer_addr);  //PHIL added so that audio connect happens automatically after a connect    
+    vTaskDelay(4000 / portTICK_PERIOD_MS);
+    printf("Connecting Audio...\n");              //PHIL added printf("Connect Audio\n") statement
+    esp_hf_ag_audio_connect(hf_peer_addr);  //PHIL added esp_hf_ag_audio_connect(hf_peer_addr) so audio_connect happens automatically right after a connect    
+    printf("Connected Audio\n");              //PHIL added printf("Connect Audio\n") statement
     return 0;
 }
 
@@ -141,7 +174,7 @@ HF_CMD_HANDLER(vra_off)
     printf("Stop Voicer Recognition.\n");
     print_mac_address_and_role(hf_peer_addr);
     esp_hf_ag_vra_control(hf_peer_addr,0);
-    return 0;
+    return 0;   
 }
 
 //AT+VGS or AT+VGM

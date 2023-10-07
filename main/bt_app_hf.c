@@ -3,6 +3,54 @@
  *
  * SPDX-License-Identifier: Unlicense OR CC0-1.0
  */
+/*
+This file `bt_app_hf.c` seems to be a part of the Bluetooth Hands-Free Profile (HFP) implementation 
+for the Espressif platform, specifically the ESP32 or similar Espressif chips. 
+The code revolves around supporting hands-free capabilities, especially in scenarios like 
+car kits or wireless headphones.
+
+Here are the main points about the code:
+
+1. Inclusion of Headers: 
+    - The file includes various headers related to the ESP32 Bluetooth stack 
+    (`esp_bt_main.h`, `esp_bt_device.h`, `esp_gap_bt_api.h`, `esp_hf_ag_api.h`, etc.), 
+    FreeRTOS (`FreeRTOS.h`, `task.h`, `queue.h`, `semphr.h`, `ringbuf.h`) 
+    and some standard C headers (`stdint.h`, `stdbool.h`, `stdlib.h`, `string.h`).
+
+2. Global Variables and Enum Strings: 
+    - It contains various string arrays for making log outputs more informative, 
+    like `c_hf_evt_str`, `c_connection_state_str`, `c_audio_state_str`, etc.
+
+3. Audio Data Handling (if using HCI):
+    - If the configuration `CONFIG_BT_HFP_AUDIO_DATA_PATH_HCI` is defined, the file provides 
+    a way to generate a sine wave audio signal and handle the incoming and outgoing audio data 
+    through the HCI (Host Controller Interface).
+    - The sine wave data is stored in `sine_int16` array, and there are functions to send audio data 
+    (`bt_app_send_data`), handle the periodic sending of audio data (`bt_app_send_data_task`), 
+    and shut down the send data task (`bt_app_send_data_shut_down`).
+
+4. Bluetooth Event Callback: 
+    - The main function of interest in the file is `bt_app_hf_cb`, which acts as a callback to 
+    handle various Bluetooth Hands-Free events.
+    - Each event, such as connection state changes, audio state changes, volume control, and more, 
+    is handled within the switch-case construct of this function. Depending on the event, 
+    appropriate actions are taken, and sometimes, responses are sent back.
+    - For example, in the case of `ESP_HF_DIAL_EVT`, the code checks the type of dial request 
+    (dialing by number, by memory, or the last number) and acts accordingly.
+    - There's extensive logging throughout to ensure that the user (or developer) can 
+    get insights into what's happening during the operation.
+
+5. Miscellaneous:
+    - There are function prototypes mentioned as "PHIL function declarations". 
+    It seems like there's some customization or placeholders for additional functionalities.
+    - The licensing information at the beginning indicates that the code can be used under 
+    the "Unlicense" or the "CC0-1.0" license.
+
+Overall, the code is structured to support Bluetooth hands-free operations and handle various events 
+and scenarios related to Bluetooth HFP on an Espressif platform. If you're planning to integrate 
+or modify this code, ensure that you understand each functionality, especially the audio handling 
+part if you're using HCI for audio data path.
+*/
 
 #include <stdint.h>
 #include <stdbool.h>
@@ -27,8 +75,6 @@
 #include "bt_app_hf.h"
 #include "osi/allocator.h"
 
-// #include "btc_hf_client.h"  //PHIL added so we can call: bt_status_t btc_hf_client_connect_audio( bt_bdaddr_t *bd_addr )
-
 const char *c_hf_evt_str[] = {
     "CONNECTION_STATE_EVT",              /*!< SERVICE LEVEL CONNECTION STATE CONTROL */
     "AUDIO_STATE_EVT",                   /*!< AUDIO CONNECTION STATE CONTROL */
@@ -52,7 +98,7 @@ const char *c_hf_evt_str[] = {
 
 //----------
 //PHIL function declarations
- void bt_app_send_data(void);
+ // void bt_app_send_data(void);
 //----------
 
 //esp_hf_connection_state_t
@@ -298,6 +344,13 @@ void bt_app_send_data_shut_down(void)
 }
 #endif /* #if CONFIG_BT_HFP_AUDIO_DATA_PATH_HCI */
 
+/*
+ * The function bt_app_hf_cb is critical for handling Bluetooth events. 
+ * This function handles all the critical bluetooth events: connect, audio, voice recognition, 
+ * volume control, unknown AT commands, call indication, current operator events, and more. 
+ *
+ * These events guide the application on how to respond to various Bluetooth interactions.
+ */
 void bt_app_hf_cb(esp_hf_cb_event_t event, esp_hf_cb_param_t *param)
 {
     if (event <= ESP_HF_PKT_STAT_NUMS_GET_EVT) {
