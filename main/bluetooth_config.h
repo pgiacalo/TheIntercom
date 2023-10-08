@@ -1,7 +1,7 @@
 #ifndef BLUETOOTH_CONFIG_H
 #define BLUETOOTH_CONFIG_H
 
-#include "sdkconfig.h"
+// #include "sdkconfig.h"
 
 //PHIL added this config file to set the role and the mac addresses
 
@@ -21,8 +21,8 @@
 #endif
 
 
-//setup the ESP32 target in menuconfig
-#if CONFIG_IDF_TARGET_ESP32         
+// //setup the ESP32 target in menuconfig
+// #if CONFIG_IDF_TARGET_ESP32         
 
     // Pin configurations for ESP32 Master
     #define MASTER_GPIO_DIN         14
@@ -36,23 +36,23 @@
     #define SLAVE_GPIO_BCLK         27  //was 17 (green)
     #define SLAVE_GPIO_LRC          26  //was 19 (blue)
 
-#elif CONFIG_IDF_TARGET_ESP32S3
+// #elif CONFIG_IDF_TARGET_ESP32S3
 
-    // Pin configurations for ESP32-S3 Master (Modify pins as needed)
-    #define MASTER_GPIO_DIN         /* Your S3 Pin */
-    #define MASTER_GPIO_DOUT        /* Your S3 Pin */
-    #define MASTER_GPIO_BCLK        /* Your S3 Pin */
-    #define MASTER_GPIO_LRC         /* Your S3 Pin */
+//     // Pin configurations for ESP32-S3 Master (Modify pins as needed)
+//     #define MASTER_GPIO_DIN         /* Your S3 Pin */
+//     #define MASTER_GPIO_DOUT        /* Your S3 Pin */
+//     #define MASTER_GPIO_BCLK        /* Your S3 Pin */
+//     #define MASTER_GPIO_LRC         /* Your S3 Pin */
 
-    // Pin configurations for ESP32-S3 Slave (Modify pins as needed)
-    #define SLAVE_GPIO_DOUT         /* Your S3 Pin */
-    #define SLAVE_GPIO_DIN          /* Your S3 Pin */
-    #define SLAVE_GPIO_BCLK         /* Your S3 Pin */
-    #define SLAVE_GPIO_LRC          /* Your S3 Pin */
+//     // Pin configurations for ESP32-S3 Slave (Modify pins as needed)
+//     #define SLAVE_GPIO_DOUT         /* Your S3 Pin */
+//     #define SLAVE_GPIO_DIN          /* Your S3 Pin */
+//     #define SLAVE_GPIO_BCLK         /* Your S3 Pin */
+//     #define SLAVE_GPIO_LRC          /* Your S3 Pin */
 
-#else
-    #error "Unsupported IDF target (see bluetooth_config.h)"
-#endif 
+// #else
+//     #error "Unsupported IDF target (see bluetooth_config.h)"
+// #endif 
 
 #endif // BLUETOOTH_CONFIG_H
 
