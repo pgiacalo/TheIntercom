@@ -1,14 +1,11 @@
-Oct 3, 2023
+Oct 8, 2023
 
 Overview
 --------
 This project started with the latest code from one of Espressif ESP-IDF ESP32 examples.
-
-Specifically, it began with example code provided in Espressif's esp-idf development environment. 
 The code example is called "Hands Free Protocol Audio Gateway" (hfp_ag). 
 
-The directory path to the example is given below. Note that it is found under bluetooth/bluedroid. 
-	esp/esp-idf/examples/bluetooth/bluedroid/classic_bt/hfp_ag 
+	~/esp/esp-idf/examples/bluetooth/bluedroid/classic_bt/hfp_ag
 
 The term "Gateway" got me interested in exploring this example, since it implies code that might 
 enable a central point for bluetooth communication (which is my goal). 

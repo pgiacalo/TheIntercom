@@ -129,7 +129,7 @@ HF_CMD_HANDLER(conn)
     esp_hf_ag_slc_connect(hf_peer_addr);
     printf("Connected\n");
 
-    vTaskDelay(4000 / portTICK_PERIOD_MS);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
     printf("Connecting Audio...\n");              //PHIL added printf("Connect Audio\n") statement
     esp_hf_ag_audio_connect(hf_peer_addr);  //PHIL added esp_hf_ag_audio_connect(hf_peer_addr) so audio_connect happens automatically right after a connect    
     printf("Connected Audio\n");              //PHIL added printf("Connect Audio\n") statement
@@ -253,7 +253,7 @@ HF_CMD_HANDLER(ind_change)
     esp_hf_ag_ciev_report(hf_peer_addr, ESP_HF_IND_TYPE_SERVICE, ntk_state);
     esp_hf_ag_ciev_report(hf_peer_addr, ESP_HF_IND_TYPE_SIGNAL, signal);
     // esp_hf_ag_ciev_report(param->ind_upd.remote_addr, ESP_HF_IND_TYPE_BATTCHG, battery);
-    
+
     return 0;
 }
 
